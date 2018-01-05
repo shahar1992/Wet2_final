@@ -73,75 +73,19 @@ class SplayTree {
         }
 
         /**
-         * Set function to set the given Node as left child
-         */
-        void setLeft(Node<P, GetScore1> *Left) {
-            if (Left) {
-                int size_change =
-                        Left->left_tree_size + Left->right_tree_size + 1;
-                int sum_change =
-                        Left->left_tree_sum + Left->right_tree_sum +
-                        getScore(Left->data);
-                updateParents(Left, -size_change, -sum_change);
-                if (Left->parent) {
-                    if (Left->parent->right == Left)
-                        Left->parent->right = nullptr;
-                    else
-                        Left->parent->left = nullptr;
-                }
-                if (this->left)
-                    left->parent = nullptr;
-            }
+          * Set function to set the given Node as left child
+          */
+        void setLeft(Node<P,GetScore1>* Left) {
             left = Left;
-            left_tree_size = 0;
-            left_tree_sum = 0;
-            if (left) {
-                int size_change =
-                        left->left_tree_size + left->right_tree_size + 1;
-                int sum_change =
-                        left->left_tree_sum + left->right_tree_sum +
-                        getScore(left->data);
-                if (this->parent == left)
-                    this->parent = nullptr;
-                left->parent = this;
-                updateParents(left, size_change, sum_change);
-            }
+            if (left) left->parent = this;
         }
 
         /**
          * Set function to set the given Node as right child
          */
         void setRight(Node<P, GetScore1> *Right) {
-            if (Right) {
-                int size_change =
-                        Right->left_tree_size + Right->right_tree_size + 1;
-                int sum_change =
-                        Right->left_tree_sum + Right->right_tree_sum +
-                        getScore(Right->data);
-                updateParents(Right, -size_change, -sum_change);
-                if (Right->parent) {
-                    if (Right->parent->right == Right)
-                        Right->parent->right = nullptr;
-                    else
-                        Right->parent->left = nullptr;
-                }
-                if (this->right)
-                    right->parent = nullptr;
-            }
             right = Right;
-            right_tree_size = 0;
-            right_tree_sum = 0;
-            if (right) {
-                int size_change =
-                        right->left_tree_size + right->right_tree_size + 1;
-                int sum_change =
-                        right->left_tree_sum + right->right_tree_sum +
-                        getScore(right->data);
-                if (this->parent == right)
-                    this->parent = nullptr;
-                right->parent = this;
-                updateParents(right, size_change, sum_change);
-            }
+            if (Right) right -> parent = this;
         }
     }; //---------------END OF NODE-------------------------------
     //-------------PRIVATE FUNCTIONS OF SPLAY TREE----------------
@@ -156,11 +100,19 @@ class SplayTree {
             B->parent = nullptr;
             B->setRight(A);
             this->root = B;
+            A->left_tree_size = B->right_tree_size;
+            A->left_tree_sum = B->right_tree_sum;
+            B->right_tree_size = B->right_tree_size + A->right_tree_size + 1;
+            B->right_tree_sum = B->right_tree_sum + A->right_tree_sum + getScore(A->data);
         } else {         //in case B == A -> right
             A->setRight(B->left);
             B->parent = nullptr;
             B->setLeft(A);
             this->root = B;
+            A->right_tree_size = B->left_tree_size;
+            A->right_tree_sum = B->left_tree_sum;
+            B->left_tree_size = B->left_tree_size + A->left_tree_size + 1;
+            B->left_tree_sum = B->left_tree_sum + A->left_tree_sum + getScore(A->data);
         }
     }
 
@@ -184,11 +136,35 @@ class SplayTree {
             A->setRight(A->parent);
             A->setLeft(B->right);
             B->setRight(A);
+            A->right->left_tree_size = A->right_tree_size;
+            A->right->left_tree_sum = A->right_tree_sum;
+            A->right_tree_size =
+                    A->right_tree_size + A->right->right_tree_size + 1;
+            A->right_tree_sum = A->right_tree_sum + A->right->right_tree_sum +
+                    getScore(A->right->data);
+            A->left_tree_size = B->right_tree_size;
+            A->left_tree_sum = B->right_tree_sum;
+            B->right_tree_size =
+                    B->right_tree_size + A->right_tree_size + 1;
+            B->right_tree_sum = B->right_tree_sum + A->right_tree_sum +
+                                getScore(A->data);
         } else {                                          // right right case
             A->parent->setRight(A->left);
             A->setLeft(A->parent);
             A->setRight(B->left);
             B->setLeft(A);
+            A->left->right_tree_size = A->left_tree_size;
+            A->left->right_tree_sum = A->left_tree_sum;
+            A->left_tree_size =
+                    A->left_tree_size + A->left->left_tree_size + 1;
+            A->left_tree_sum = A->left_tree_sum + A->left->left_tree_sum +
+                                getScore(A->left->data);
+            A->right_tree_size = B->left_tree_size;
+            A->right_tree_sum = B->left_tree_sum;
+            B->left_tree_size =
+                    B->left_tree_size + A->left_tree_size + 1;
+            B->left_tree_sum = B->left_tree_sum + A->left_tree_sum +
+                                getScore(A->data);
         }
     }
 
@@ -208,20 +184,38 @@ class SplayTree {
         }
         if (A->parent->left == A)    //left right case
         {
-            A->parent->setLeft(B->right);
-            Node<T, GetScore> *tmp = A->parent;
-            A->parent = nullptr;
-            A->setRight(B->left);
-            B->setRight(tmp);
-            B->setLeft(A);
+            A -> parent -> setLeft(B -> right);
+            A -> setRight(B -> left);
+            B -> setRight(A -> parent);
+            B -> setLeft(A);
+            A->right_tree_size = B->left_tree_size;
+            A->right_tree_sum = B->left_tree_sum;
+            B->right->left_tree_size = B->right_tree_size;
+            B->right->left_tree_sum = B->right_tree_sum;
+            B->left_tree_size = A->left_tree_size + A->right_tree_size + 1;
+            B->left_tree_sum = A->left_tree_sum + A->right_tree_sum +
+                    getScore(A->data);
+            B->right_tree_size = B->right->left_tree_size +
+                    B->right->right_tree_size + 1;
+            B->right_tree_sum = B->right->left_tree_sum +
+                    B->right->right_tree_sum + getScore(B->right->data);
         } else                                          // right left case
         {
-            A->parent->setRight(B->left);
-            Node<T, GetScore> *tmp = A->parent;
-            A->parent = nullptr;
-            A->setLeft(B->right);
-            B->setLeft(tmp);
-            B->setRight(A);
+            A -> parent -> setRight(B -> left);
+            A -> setLeft(B -> right);
+            B -> setLeft(A -> parent);
+            B -> setRight(A);
+            A->left_tree_size = B->right_tree_size;
+            A->left_tree_sum = B->right_tree_sum;
+            B->left->right_tree_size = B->left_tree_size;
+            B->left->right_tree_sum = B->left_tree_sum;
+            B->right_tree_size = A->right_tree_size + A->left_tree_size + 1;
+            B->right_tree_sum = A->right_tree_sum + A->left_tree_sum +
+                               getScore(A->data);
+            B->left_tree_size = B->left->left_tree_size +
+                                 B->left->right_tree_size + 1;
+            B->left_tree_sum = B->left->left_tree_sum +
+                                B->left->right_tree_sum + getScore(B->left->data);
         }
     }
 
@@ -248,8 +242,20 @@ class SplayTree {
      */
     void join(SplayTree<T, GetScore> *T2) {
         this->find_max();
-        if (this->root)
+        if (this->root){
             this->root->setRight(T2->root);
+            if(this->root->right) {
+                this->root->right_tree_size =
+                        this->root->right->right_tree_size +
+                        this->root->right->left_tree_size + 1;
+                this->root->right_tree_sum = this->root->right->right_tree_sum +
+                                             this->root->right->left_tree_sum +
+                                             getScore(this->root->right->data);
+            } else {
+                this->root->right_tree_size = 0;
+                this->root->right_tree_sum = 0;
+            }
+        }
         else
             this->root = T2->root;
         T2->root = nullptr;
@@ -380,6 +386,10 @@ public:
                     X->left->right_tree_size = 0;
                     X->left->right_tree_sum = 0;
                 }
+                X->right_tree_size = root->right_tree_size;
+                X->right_tree_sum = root->right_tree_sum;
+                X->left_tree_size = root->left_tree_size + 1;
+                X->left_tree_sum = root->left_tree_sum + getScore(root->data);
                 root = X;
             } else {
                 X->setRight(root);
@@ -389,6 +399,10 @@ public:
                     X->right->left_tree_size = 0;
                     X->right->left_tree_sum = 0;
                 }
+                X->left_tree_size = root->left_tree_size;
+                X->left_tree_sum = root->left_tree_sum;
+                X->right_tree_size = root->right_tree_size + 1;
+                X->right_tree_sum = root->right_tree_sum + getScore(root->data);
                 root = X;
             }
             this->size++;

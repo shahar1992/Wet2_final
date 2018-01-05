@@ -12,7 +12,7 @@ public:
     explicit Comp(int& x): x(x) {}
     int operator()(const int& y) const {
         if (x == y) return 0;
-        else if (x > y) return -1;
+        else if (x < y) return -1;
         return 1;
     }
 };

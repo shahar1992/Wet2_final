@@ -7,46 +7,44 @@
 
 #include "SplayTree.h"
 #include "Gladiator.h"
-#include "SplayTree.h"
 
-class GetScore {
-    int score;
-public:
-    explicit GetScore(const Gladiator &X) : score(X.getScore()) {};
-
-    int operator()() const {
-        return score;
-    }
-};
-
-class TrainingGroup {
-
-
+template<class GetScore>
+class TrainingGroup{
     int ID;
     SplayTree<Gladiator, GetScore> gladiators;
 
 public:
 
-    TrainingGroup();
 
-    TrainingGroup(int id);
+    TrainingGroup<GetScore>():ID(), gladiators(){};
 
-    TrainingGroup(const TrainingGroup &group);
+    TrainingGroup<GetScore>(int id): ID(id), gladiators(){};
+
+    TrainingGroup<GetScore>(const TrainingGroup<GetScore> &group):
+            ID(group.getID()), gladiators(group.getGladiatorTree()){};
 
     /**
      * Insert a new Gladiator with given id and score.
      * @param gladiator_id
      * @param score
      */
-    void addGladiator(int gladiator_id, int score);
+    //void addGladiator(int gladiator_id, int score);
 
     /**
      * Returns the training group's ID.
      * @return ID.
      */
-    int getID() const;
+    int getID() const{
+        return ID;
+    }
 
-    SplayTree<Gladiator,GetScore> getGladiatorTree()const;
+    /**
+     * Returns the gladiators Tree of the group
+     * @return gladiators
+     */
+    SplayTree<Gladiator,GetScore> getGladiatorTree() const{
+        return gladiators;
+    };
 
 };
 

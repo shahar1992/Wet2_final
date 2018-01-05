@@ -1,13 +1,14 @@
 
 #include "TrainingGroup.h"
 
-
-//TrainingGroup::TrainingGroup() : ID(), gladiators() {};
-//
-//TrainingGroup::TrainingGroup(int id) : ID(id), gladiators() {};
-
-TrainingGroup::TrainingGroup(const TrainingGroup &group) :
-        ID(group.getID()), gladiators(group.getGladiatorTree()) {};
+class getScore {
+    int score;
+public:
+    explicit getScore(const Gladiator &X) : score(X.getScore()) {};
+    int operator()() const {
+        return score;
+    }
+};
 
 class Compare {
     Gladiator X;
@@ -19,10 +20,4 @@ public:
     }
 };
 
-int TrainingGroup::getID() const{
-    return ID;
-}
 
-SplayTree<Gladiator,GetScore> TrainingGroup::getGladiatorTree() const{
-    return gladiators;
-};
