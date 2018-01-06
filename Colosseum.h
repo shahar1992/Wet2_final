@@ -82,21 +82,26 @@ public:
         delete[] init_training_groups;
     }
 
-    ~Colosseum(){}; // need to be implemented
+    ~Colosseum(){};
 
 
     //---------Library2 functions - documented in library2--------------------
 
-    StatusType addTrainingGroup(int t);
-//    StatusType addTrainingGroup(int trainingGroupID);
+    StatusType addTrainingGroup(int groupID);
 
     StatusType addGladiator(int gladiatorID, int score, int trainingGroup);
 
     StatusType trainingGroupFight(int trainingGroup1, int trainingGroup2, int k1, int k2);
 
-    StatusType getMinTrainingGroup(int *trainingGroup);
+    int getMinTrainingGroup();
 
-    //void quit(void** DS);
+    HashChains<TrainingGroup, getTrainingGroupKey>& getTrainingGroups() {
+        return training_groups;
+    }
+
+    MinHeap& getGroupsHeap();
+
+    void quit();
 
 };
 

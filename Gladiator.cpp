@@ -33,7 +33,7 @@ int Gladiator::getTrainingGroup() const {
 }
 
 void Gladiator::setTrainingGroup(int training_group_ID) {
-    training_group_ID = training_group_ID;
+    this->training_group_ID = training_group_ID;
 }
 
 int Gladiator::compare(const Gladiator &X) const{
