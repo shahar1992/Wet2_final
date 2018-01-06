@@ -2,9 +2,9 @@
 #include "TrainingGroup.h"
 
 
-//TrainingGroup::TrainingGroup() : ID(), gladiators() {};
-//
-//TrainingGroup::TrainingGroup(int id) : ID(id), gladiators() {};
+TrainingGroup::TrainingGroup() : ID(), gladiators() {};
+
+TrainingGroup::TrainingGroup(int id) : ID(id), gladiators() {};
 
 TrainingGroup::TrainingGroup(const TrainingGroup &group) :
         ID(group.getID()), gladiators(group.getGladiatorTree()) {};

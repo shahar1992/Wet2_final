@@ -20,8 +20,6 @@ public:
 };
 
 class TrainingGroup {
-
-
     int ID;
     SplayTree<Gladiator, GetScore> gladiators;
 
@@ -46,7 +44,7 @@ public:
      */
     int getID() const;
 
-    SplayTree<Gladiator,GetScore> getGladiatorTree()const;
+    SplayTree<Gladiator, GetScore> getGladiatorTree() const;
 
 };
 
