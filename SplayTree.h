@@ -295,7 +295,7 @@ public:
     /**
     * Constructs a new Splay Tree.
     */
-    SplayTree<T, GetScore>() : root(), size() {};
+    SplayTree<T, GetScore>(const GetScore& getScore) : root(), size(), getScore(getScore) {};
 
     /**
      * Distructor
@@ -435,6 +435,44 @@ public:
         this->size--;
     }
 
+
+
+    /**
+     * The function returns the sum of the K left elements score
+     * @param k - number of elements to calculate
+     * @return sum of K left elements scores
+     */
+    int getSumKLeftElements(int k){
+        if(k == 1)
+            return getScore(*find_max());
+        else {
+            Node<T, GetScore> *X = root;
+            if (X == nullptr)
+                return 0;
+            int num_greater_elements = X->left_tree_size;
+            int sum_greater_elememts = X->left_tree_sum;
+            while (k < num_greater_elements || k > (num_greater_elements+1)) {
+                if(k < num_greater_elements){
+                    X = X->left;
+                    num_greater_elements = num_greater_elements - 1 -
+                            X->right_tree_size;
+                    sum_greater_elememts = sum_greater_elememts -
+                            getScore(X->data) - X->right_tree_sum;
+                } else {
+                    X = X->right;
+                    num_greater_elements = num_greater_elements + 1 +
+                            X->left_tree_size;
+                    sum_greater_elememts = sum_greater_elememts +
+                            getScore(X->parent->data) + X->left_tree_sum;
+
+                }
+            }
+            if(k == num_greater_elements)
+                return sum_greater_elememts;
+            else if(k == (num_greater_elements+1))
+                return sum_greater_elememts + getScore(X->data);
+        }
+    }
 
     /**
      * The function goes over the tree in order and operates a given function

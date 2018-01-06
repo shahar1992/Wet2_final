@@ -389,7 +389,6 @@ public:
             if(getKey(iterator.current->data) == key) return iterator;
         }
         return iterator;
-
     }
 
     /**

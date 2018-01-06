@@ -8,20 +8,31 @@
 #include "SplayTree.h"
 #include "Gladiator.h"
 
-template<class GetScore>
 class TrainingGroup{
+    /**
+    * function object to get a gladiators score
+    */
+    class getScore {
+    public:
+        explicit getScore(){}
+        int operator()(const Gladiator &X) const {
+            return X.getScore();
+        }
+    };
+
     int ID;
-    SplayTree<Gladiator, GetScore> gladiators;
+    SplayTree<Gladiator, getScore> gladiators;
+    bool active;
+
 
 public:
 
+    TrainingGroup():ID(), gladiators(getScore()), active(1){};
 
-    TrainingGroup<GetScore>():ID(), gladiators(){};
+    TrainingGroup(int id): ID(id), gladiators(getScore()), active(1){};
 
-    TrainingGroup<GetScore>(int id): ID(id), gladiators(){};
-
-    TrainingGroup<GetScore>(const TrainingGroup<GetScore> &group):
-            ID(group.getID()), gladiators(group.getGladiatorTree()){};
+//    TrainingGroup<GetScore>(const TrainingGroup<GetScore> &group):
+//            ID(group.getID()), gladiators(group.getGladiatorTree()), active(1){};
 
     /**
      * Insert a new Gladiator with given id and score.
@@ -42,9 +53,24 @@ public:
      * Returns the gladiators Tree of the group
      * @return gladiators
      */
-    SplayTree<Gladiator,GetScore> getGladiatorTree() const{
-        return gladiators;
-    };
+    SplayTree<Gladiator,getScore>* getGladiatorsTree() {
+        return &gladiators;
+    }
+
+    /**
+     * Returns the active status of the group
+     * @return
+     */
+    bool isGroupActive(){
+        return this->active;
+    }
+
+    /**
+     * the function makes the training group inactive
+     */
+    void shutDownGroup(){
+        this->active = 0;
+    }
 
 };
 
