@@ -29,6 +29,7 @@ namespace HashExceptions{
 
 template <class T, class GetKey>
 class HashChains {
+    friend class Colosseum;
 //--------------HASH CHAIN FIELDS-----------------------------
     List<T>* hash_table; //List is not already pointer?
     int hash_size;
@@ -155,11 +156,11 @@ public:
      * the function removes the element with the given key from the hash_table
      * @param key - the key of the element to remove
      */
-    void remove(int key){
-        List<T>& list = hash(key);
-        if(find(key) == nullptr)
+    void remove(int key) {
+        List<T> &list = hash(key);
+        if (find(key) == nullptr)
             throw HashExceptions::ElementNotFound();
-        list.remove(list.find(getKey,key));
+        list.remove(list.find(getKey, key));
         num_of_elements--;
         this->dynamicHash();
     }

@@ -469,7 +469,7 @@ public:
             }
             if(k == num_greater_elements)
                 return sum_greater_elememts;
-            else if(k == (num_greater_elements+1))
+            else //if(k == (num_greater_elements+1))
                 return sum_greater_elememts + getScore(X->data);
         }
     }

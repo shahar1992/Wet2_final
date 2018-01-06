@@ -3,8 +3,13 @@
 
 
 void* init(int n, int *trainingGroupsIDs){
-    Colosseum* DS = new Colosseum(n, trainingGroupsIDs);
-    return (void*)DS;
+    try{
+        Colosseum* DS = new Colosseum(n, trainingGroupsIDs);
+        return (void*)DS;
+    } catch(std::bad_alloc& e){
+        return NULL;
+    }
+
 }
 
 StatusType addTrainingGroup(void *DS, int trainingGroupID){

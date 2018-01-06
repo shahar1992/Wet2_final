@@ -73,16 +73,24 @@ public:
     Colosseum(int n, int* trainingGroupsIDs):
             training_groups(getTrainingGroupKey()),
             gladiators(getGladiatorKey()), groups_IDs(n, trainingGroupsIDs){
-        TrainingGroup *init_training_groups = new TrainingGroup[n];
-        for(int i=0; i < n ; ++i){
-            init_training_groups[i] = TrainingGroup(trainingGroupsIDs[i]);
+        try{
+            TrainingGroup *init_training_groups = new TrainingGroup[n];
+            for(int i=0; i < n ; ++i){
+                init_training_groups[i] = TrainingGroup(trainingGroupsIDs[i]);
+            }
+            training_groups = HashChains<TrainingGroup, getTrainingGroupKey>
+                    (init_training_groups, n, getTrainingGroupKey());
+            delete[] init_training_groups;
+        } catch (std::bad_alloc& e){
+            throw e;
         }
-        training_groups = HashChains<TrainingGroup, getTrainingGroupKey>
-                (init_training_groups, n, getTrainingGroupKey());
-        delete[] init_training_groups;
+
     }
 
-    ~Colosseum(){};
+    ~Colosseum(){
+        delete[] this->training_groups.hash_table;
+        delete[] this->gladiators.hash_table;
+    }
 
 
     //---------Library2 functions - documented in library2--------------------
@@ -101,21 +109,9 @@ public:
 
     MinHeap& getGroupsHeap();
 
-    void quit();
+    //void quit();
 
 };
-
-
-//class Compare {
-//    Gladiator X;
-//public:
-//    explicit Compare(Gladiator &X) : X(X) {}
-//
-//    int operator()(const Gladiator &Y) const {
-//        return X.compare(Y);
-//    }
-//};
-
 
 
 #endif //WET2_FINAL_COLOSSEUM1_H
