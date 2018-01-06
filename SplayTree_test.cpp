@@ -12,8 +12,8 @@ public:
     explicit Comp(int& x): x(x) {}
     int operator()(const int& y) const {
         if (x == y) return 0;
-        else if (x > y) return 1;
-        return -1;
+        else if (x < y) return -1;
+        return 1;
     }
 };
 
@@ -31,18 +31,19 @@ void printInt(const int& x) {
 }
 
 int main() {
-    SplayTree<int, getScore> tree;
+    SplayTree<int, getScore>* tree = new SplayTree<int, getScore>(getScore());
     int arr[8] = {1,15,3,8,32,6,4,8};
     for(int i=0; i<8; i++)
-        tree.insert(Comp(arr[i]), arr[i]);
+        tree->insert(Comp(arr[i]), arr[i]);
     std::cout << "InOrder Print: ";
-    tree.inOrder(tree.root, printInt);
+    tree->inOrder(tree->root, printInt);
     std::cout << "\nInOrder new tree Print: " << std::endl;
-    tree.inOrderPrint(tree.root);
+    tree->inOrderPrint(tree->root);
     std::cout << std::endl << "PreOrder Print: ";
-    tree.preOrder(tree.root, printInt);
+    tree->preOrder(tree->root, printInt);
     std::cout << std::endl << "InOrder Reversed Print: ";
-    tree.inOrderReverse(tree.root, printInt);
+    tree->inOrderReverse(tree->root, printInt);
+    delete tree;
 }
 
 

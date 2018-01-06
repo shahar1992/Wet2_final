@@ -10,7 +10,7 @@
 #include "List.h"
 
 #define nullptr 0
-#define HASH_INIT_SIZE 11
+#define HASH_INIT_SIZE 2
 #define MIN_LOAD_FACTOR 0.5
 #define MAX_LOAD_FACTOR 1
 #define LOAD_FACTOR 0.67
@@ -82,21 +82,21 @@ class HashChains {
     }
 
 public:
-//    /**
-//     * default constructor
-//     * @param getKey - function that gets the key of a T type element
-//     */
-//    HashChains<T>(const GetKey& getKey):
-//            hash_size(HASH_INIT_SIZE), num_of_elements(0), getKey(getKey){
-//        hash_table = new List<T>[HASH_INIT_SIZE];
-//    }
+    /**
+     * default constructor
+     * @param getKey - function that gets the key of a T type element
+     */
+    HashChains<T, GetKey>(const GetKey& getKey):
+            hash_size(HASH_INIT_SIZE), num_of_elements(0), getKey(getKey){
+        hash_table = new List<T>[HASH_INIT_SIZE];
+    }
 
     /**
      * Constructor
      * @param table - the new data to insert to the hash table
      * @param num  - the number of elements to insert to the hash table
      */
-    HashChains<T,GetKey>(const T* table, const int num, const GetKey& getKey):
+    HashChains<T,GetKey>(T* table, const int num, const GetKey& getKey):
             hash_size(int(num/LOAD_FACTOR)), num_of_elements(num), getKey(getKey){
         this->hash_table = new List<T>[hash_size];
         for(int i=0; i < num; ++i){
@@ -109,7 +109,7 @@ public:
      * destructor
      */
     ~HashChains<T, GetKey>(){
-        delete[] hash_table;
+        //delete[] hash_table;              //makes a bug
     }
 
 public:
@@ -143,13 +143,12 @@ public:
         try{
             if(find(getKey(element)))
                 throw HashExceptions::ElementAlreadyExists();
-
         } catch (HashExceptions::ElementNotFound& e){}
         num_of_elements++;
         this->dynamicHash();
-        printHash();
         List<T>& list = hash(getKey(element));
         list.insert(element);
+       // printHash();
     }
 
     /**

@@ -3,13 +3,12 @@
 #include "Gladiator.h"
 
 Gladiator::Gladiator(int gladiatorID, int score, int training_group_ID) :
-        ID(gladiatorID), score(score), training_group_ID() {}
+        ID(gladiatorID), score(score), training_group_ID(training_group_ID) {}
 
 Gladiator::Gladiator() : ID(), score(), training_group_ID() {};
 
-Gladiator::Gladiator(const Gladiator &X) {
-
-}
+Gladiator::Gladiator(const Gladiator &X): ID(X.getID()), score(X.getScore()),
+                                  training_group_ID(X.getTrainingGroup()) {}
 
 int Gladiator::getScore() const {
     return score;
