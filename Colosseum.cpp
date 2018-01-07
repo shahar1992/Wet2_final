@@ -4,13 +4,25 @@
 
 #include "Colosseum.h"
 
+
+class Colosseum::HelpDynamicHashFunc {
+public:
+    explicit HelpDynamicHashFunc(){}
+    void operator()(TrainingGroup& X) const{
+//        TrainingGroup* t = dynamic_cast<TrainingGroup*>(X);
+//        if(t)
+            X.gladiators = nullptr;
+    }
+    void operator()(Gladiator& X) const{}
+};
+
 void setNewMinInMinHeap(Colosseum* colosseum);
 
 StatusType Colosseum::addTrainingGroup(int trainingGroupID) {
     TrainingGroup *trainingGroup;
     try {
         trainingGroup = new TrainingGroup(trainingGroupID);
-        training_groups.insert(*trainingGroup);
+        training_groups.insert(*trainingGroup, HelpDynamicHashFunc());
         groups_IDs.insert(trainingGroupID);
         delete trainingGroup;
         return SUCCESS;
@@ -22,13 +34,12 @@ StatusType Colosseum::addTrainingGroup(int trainingGroupID) {
     }
 }
 
-StatusType
-Colosseum::addGladiator(int gladiatorID, int score, int trainingGroup) {
+StatusType Colosseum::addGladiator(int gladiatorID, int score, int trainingGroup) {
     Gladiator *gladiator;
     try {
         TrainingGroup *group = this->training_groups.find(trainingGroup);
         gladiator = new Gladiator(gladiatorID, score, trainingGroup);
-        gladiators.insert(*gladiator);
+        gladiators.insert(*gladiator, HelpDynamicHashFunc());
         group->getGladiatorsTree()->insert
                 (GladiatorCompareByLevelAndID(*gladiator), *gladiator);
         delete gladiator;

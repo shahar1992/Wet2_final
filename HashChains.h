@@ -51,7 +51,8 @@ class HashChains {
      * hash_table will be resized according to the LOAD_FACTOR.
      * (num_of_Elements/LOAD_FACTOR)
      */
-    void dynamicHash(){
+    template<typename HelpFunc>
+    void dynamicHash(const HelpFunc& helpFunc){
         if(((double)num_of_elements/hash_size > ((double)MAX_LOAD_FACTOR)) ||
         ((double)num_of_elements/hash_size < (double)MIN_LOAD_FACTOR)){
             List<T>* old_hash_table = hash_table;
@@ -71,6 +72,10 @@ class HashChains {
                     while (iterator != ListToDestroy.end()) {
                         List<T>& list = hash(getKey(*iterator));
                         list.insert(*iterator);
+                        helpFunc(*iterator);
+//                        TrainingGroup t = dynamic_cast<TrainingGroup>(*iterator);
+//                        if(t)
+//                            t.gladiators = nullptr;
                         ListToDestroy.remove(ListToDestroy.begin());
                         iterator = ListToDestroy.begin();
                     }
@@ -139,14 +144,15 @@ public:
      * exception
      * @param element - the element to insert
      */
-    void insert(const T& element)
+    template<typename HelpFunc>
+    void insert(const T& element, const HelpFunc& helpFunc)
     {
         try{
             if(find(getKey(element)))
                 throw HashExceptions::ElementAlreadyExists();
         } catch (HashExceptions::ElementNotFound& e){}
         num_of_elements++;
-        this->dynamicHash();
+        this->dynamicHash(helpFunc);
         List<T>& list = hash(getKey(element));
         list.insert(element);
        // printHash();
@@ -156,13 +162,14 @@ public:
      * the function removes the element with the given key from the hash_table
      * @param key - the key of the element to remove
      */
-    void remove(int key) {
+    template<typename HelpFunc>
+    void remove(int key, const HelpFunc& helpFunc) {
         List<T> &list = hash(key);
         if (find(key) == nullptr)
             throw HashExceptions::ElementNotFound();
         list.remove(list.find(getKey, key));
         num_of_elements--;
-        this->dynamicHash();
+        this->dynamicHash(helpFunc);
     }
 
 

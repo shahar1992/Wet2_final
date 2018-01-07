@@ -57,7 +57,14 @@ class Colosseum {
         }
     };
 
+    class HelpDynamicHashFunc;
 
+    template<class T>
+    void Func(typename List<T>::Iterator X){
+        TrainingGroup* t = dynamic_cast<TrainingGroup*>(&X);
+        if(t)
+            t->gladiators = nullptr;
+    }
     //-----------Colosseum Fields--------------------------
     HashChains<TrainingGroup, getTrainingGroupKey> training_groups;
     HashChains<Gladiator, getGladiatorKey> gladiators;

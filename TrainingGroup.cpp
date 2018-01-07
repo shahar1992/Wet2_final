@@ -1,6 +1,6 @@
 
 #include "TrainingGroup.h"
-
+//
 //class getScore {
 //    int score;
 //public:
@@ -10,14 +10,14 @@
 //    }
 //};
 
-class Compare {
-    Gladiator X;
-public:
-    explicit Compare(Gladiator &X) : X(X) {}
-
-    int operator()(const Gladiator &Y) const {
-        return X.compare(Y);
-    }
-};
+//class Compare {
+//    Gladiator X;
+//public:
+//    explicit Compare(Gladiator &X) : X(X) {}
+//
+//    int operator()(const Gladiator &Y) const {
+//        return X.compare(Y);
+//    }
+//};
 
 

@@ -451,7 +451,7 @@ public:
                 return 0;
             int num_greater_elements = X->left_tree_size;
             int sum_greater_elememts = X->left_tree_sum;
-            while (k < num_greater_elements || k > (num_greater_elements+1)) {
+            while ((k < num_greater_elements || k > (num_greater_elements+1)) && !X) {
                 if(k < num_greater_elements){
                     X = X->left;
                     num_greater_elements = num_greater_elements - 1 -

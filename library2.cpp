@@ -20,7 +20,7 @@ StatusType addTrainingGroup(void *DS, int trainingGroupID){
 
 StatusType addGladiator(void *DS, int gladiatorID, int score, int trainingGroup){
     if(!DS || gladiatorID < 0 || trainingGroup < 0 ||
-            score < 0 || score > 100)
+            score < 0 )
         return INVALID_INPUT;
     return ((Colosseum*)DS)->addGladiator(gladiatorID, score, trainingGroup);
 }

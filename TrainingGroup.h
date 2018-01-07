@@ -19,17 +19,20 @@ class TrainingGroup{
             return X.getScore();
         }
     };
+    friend class Colosseum;
 
     int ID;
-    SplayTree<Gladiator, getScore> gladiators;
+    SplayTree<Gladiator, getScore>* gladiators;
     bool active;
 
 
 public:
 
-    TrainingGroup():ID(), gladiators(getScore()), active(1){};
+    TrainingGroup():ID(),
+        gladiators(new SplayTree<Gladiator, getScore>(getScore())), active(1){};
 
-    TrainingGroup(int id): ID(id), gladiators(getScore()), active(1){};
+    TrainingGroup(int id): ID(id),
+        gladiators(new SplayTree<Gladiator, getScore>(getScore())), active(1){};
 
 //    TrainingGroup<GetScore>(const TrainingGroup<GetScore> &group):
 //            ID(group.getID()), gladiators(group.getGladiatorTree()), active(1){};
@@ -54,7 +57,7 @@ public:
      * @return gladiators
      */
     SplayTree<Gladiator,getScore>* getGladiatorsTree() {
-        return &gladiators;
+        return gladiators;
     }
 
     /**
