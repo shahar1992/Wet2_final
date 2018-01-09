@@ -30,7 +30,6 @@ public:
 
     ~MinHeap();
 
-    //dont forget tyo delete!!!!
     int getValue(int i);
     int getHeapSize();
     int getArraySize();

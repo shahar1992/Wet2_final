@@ -31,8 +31,8 @@ template <class T, class GetKey>
 class HashChains {
     friend class Colosseum;
 //--------------HASH CHAIN FIELDS-----------------------------
-    List<T>* hash_table; //List is not already pointer?
     int hash_size;
+    List<T>* hash_table; //List is not already pointer?
     int num_of_elements;
     GetKey getKey;
 
@@ -73,17 +73,14 @@ class HashChains {
                         List<T>& list = hash(getKey(*iterator));
                         list.insert(*iterator);
                         helpFunc(*iterator);
-//                        TrainingGroup t = dynamic_cast<TrainingGroup>(*iterator);
-//                        if(t)
-//                            t.gladiators = nullptr;
-                        ListToDestroy.remove(ListToDestroy.begin());
+                        ListToDestroy.remove(iterator);
                         iterator = ListToDestroy.begin();
                     }
                 } catch (LExceptions::ElementNotFound& e) {
                     throw HashExceptions::ElementNotFound();
                 }
             }
-            delete [] old_hash_table;
+            delete[] old_hash_table;
         }
     }
 
@@ -92,10 +89,9 @@ public:
      * default constructor
      * @param getKey - function that gets the key of a T type element
      */
-    HashChains<T, GetKey>(const GetKey& getKey):
-            hash_size(HASH_INIT_SIZE), num_of_elements(0), getKey(getKey){
-        hash_table = new List<T>[HASH_INIT_SIZE];
-    }
+    HashChains<T, GetKey>(const GetKey& getKey): hash_size(HASH_INIT_SIZE),
+             hash_table(new List<T>[HASH_INIT_SIZE]),
+             num_of_elements(0), getKey(getKey){}
 
     /**
      * Constructor
@@ -103,11 +99,12 @@ public:
      * @param num  - the number of elements to insert to the hash table
      */
     HashChains<T,GetKey>(T* table, const int num, const GetKey& getKey):
-            hash_size(int(num/LOAD_FACTOR)), num_of_elements(num), getKey(getKey){
+            hash_size(int(num/LOAD_FACTOR)), num_of_elements(num),
+            getKey(getKey){
         this->hash_table = new List<T>[hash_size];
         for(int i=0; i < num; ++i){
             List<T>& list = hash(getKey(table[i]));
-            list.insert(table[i]) ;
+            list.insert(table[i]);
         }
     }
 
@@ -115,7 +112,7 @@ public:
      * destructor
      */
     ~HashChains<T, GetKey>(){
-        //delete[] hash_table;              //makes a bug
+        delete[] hash_table;              //makes a bug
     }
 
 public:

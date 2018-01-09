@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 98)
 
 set(SOURCE_FILES
         Gladiator.cpp Gladiator.h
-        TrainingGroup.h TrainingGroup.cpp
+        TrainingGroup.h
         List.h
         SplayTree.h
         MinHeap.h MinHeap.cpp

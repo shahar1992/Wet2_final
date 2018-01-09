@@ -28,21 +28,15 @@ class TrainingGroup{
 
 public:
 
-    TrainingGroup():ID(),
-        gladiators(new SplayTree<Gladiator, getScore>(getScore())), active(1){};
+    TrainingGroup(): ID(), gladiators(), active(1){};
 
-    TrainingGroup(int id): ID(id),
-        gladiators(new SplayTree<Gladiator, getScore>(getScore())), active(1){};
+    TrainingGroup(int id): ID(id), gladiators(), active(1){
+        gladiators = new SplayTree<Gladiator, getScore>(getScore());
+    };
 
-//    TrainingGroup<GetScore>(const TrainingGroup<GetScore> &group):
-//            ID(group.getID()), gladiators(group.getGladiatorTree()), active(1){};
-
-    /**
-     * Insert a new Gladiator with given id and score.
-     * @param gladiator_id
-     * @param score
-     */
-    //void addGladiator(int gladiator_id, int score);
+    ~TrainingGroup(){
+        delete this->gladiators;
+    }
 
     /**
      * Returns the training group's ID.
@@ -74,8 +68,5 @@ public:
     void shutDownGroup(){
         this->active = 0;
     }
-
 };
-
-
 #endif //WET2_FINAL_TRAININGGROUP_H

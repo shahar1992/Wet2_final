@@ -3,6 +3,11 @@
 
 
 void* init(int n, int *trainingGroupsIDs){
+    if(n < 2) return  NULL;
+    for(int i = 0; i < n ;i++){
+        if(trainingGroupsIDs[i] < 0)
+            return NULL;
+    }
     try{
         Colosseum* DS = new Colosseum(n, trainingGroupsIDs);
         return (void*)DS;

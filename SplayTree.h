@@ -261,31 +261,6 @@ class SplayTree {
         T2->root = nullptr;
     }
 
-
-//---################################split doesn't support the invariants#####################---------------
-    /**
-     * The function splits a given tree into two trees according to the
-     * given predicate function (with given node to compare to)
-     * T1 will get all the lower or equal values
-     * T2 will get all the higher values
-     */
-    template<typename Predicate>
-    void split(const Predicate &predicate, SplayTree<T, GetScore> &T1,
-               SplayTree<T, GetScore> &T2) {
-        this->find(predicate);
-        if (predicate(root) >= 0) {
-            T1.root = root;
-            T1.root->right = nullptr;
-            T2.root = root->right;
-            T2.root->parent = nullptr;
-        } else {
-            T1.root = root->left;
-            T1.root->parent = nullptr;
-            T2.root = root;
-            T2.root->left = nullptr;
-        }
-    }
-
 public:
     //--------------SPLAY TREE FIELDS-----------------------------
     Node<T, GetScore> *root;
@@ -295,18 +270,28 @@ public:
     /**
     * Constructs a new Splay Tree.
     */
-    SplayTree<T, GetScore>(const GetScore& getScore) : root(), size(), getScore(getScore) {};
+    SplayTree<T, GetScore>(const GetScore& getScore) : root(nullptr),
+                                               size(0), getScore(getScore) {
+        root = nullptr;
+        size = 0;
+    };
 
     /**
      * Distructor
      */
     ~SplayTree() {
-        int index = 0;
-        Node<T, GetScore> **nodes = new Node<T, GetScore> *[this->size];
-        convertTreeToNodesArray(root, &index, nodes);
-        for (int i = 0; i < this->size; i++)
-            delete nodes[i];
-        delete[] nodes;
+        deleteTree(this->root);
+    }
+
+    /**
+     * help function to delete the tree recursively
+     * @param X - the node to delete
+     */
+    void deleteTree(Node<T, GetScore>* X){
+        if (!X) return;
+        deleteTree(X->left);
+        deleteTree(X->right);
+        delete X;
     }
 
     /**
@@ -381,26 +366,26 @@ public:
             else if (predicate(root->data) < 0) {
                 X->setLeft(root);
                 X->setRight(root->right);
+                X->right_tree_size = root->right_tree_size;
+                X->right_tree_sum = root->right_tree_sum;
                 if (X->left != nullptr) {
                     X->left->right = nullptr;
                     X->left->right_tree_size = 0;
                     X->left->right_tree_sum = 0;
                 }
-                X->right_tree_size = root->right_tree_size;
-                X->right_tree_sum = root->right_tree_sum;
                 X->left_tree_size = root->left_tree_size + 1;
                 X->left_tree_sum = root->left_tree_sum + getScore(root->data);
                 root = X;
             } else {
                 X->setRight(root);
                 X->setLeft(root->left);
+                X->left_tree_size = root->left_tree_size;
+                X->left_tree_sum = root->left_tree_sum;
                 if (X->right != nullptr) {
                     X->right->left = nullptr;
                     X->right->left_tree_size = 0;
                     X->right->left_tree_sum = 0;
                 }
-                X->left_tree_size = root->left_tree_size;
-                X->left_tree_sum = root->left_tree_sum;
                 X->right_tree_size = root->right_tree_size + 1;
                 X->right_tree_sum = root->right_tree_sum + getScore(root->data);
                 root = X;
@@ -435,8 +420,6 @@ public:
         this->size--;
     }
 
-
-
     /**
      * The function returns the sum of the K left elements score
      * @param k - number of elements to calculate
@@ -447,11 +430,9 @@ public:
             return getScore(*find_max());
         else {
             Node<T, GetScore> *X = root;
-            if (X == nullptr)
-                return 0;
             int num_greater_elements = X->left_tree_size;
             int sum_greater_elememts = X->left_tree_sum;
-            while ((k < num_greater_elements || k > (num_greater_elements+1)) && !X) {
+            while ((k < num_greater_elements || k > (num_greater_elements+1))) {
                 if(k < num_greater_elements){
                     X = X->left;
                     num_greater_elements = num_greater_elements - 1 -
@@ -464,7 +445,6 @@ public:
                             X->left_tree_size;
                     sum_greater_elememts = sum_greater_elememts +
                             getScore(X->parent->data) + X->left_tree_sum;
-
                 }
             }
             if(k == num_greater_elements)
@@ -515,120 +495,7 @@ public:
         inOrder(X->right, function);
     }
 
-
-    /**
-* function that converts a given tree into array of Nodes<T> pointers
-* @param node - the root of the tree to convert
-* @param index - the current index of the given "root"
-* @param array  - the array to insert the nodes to
-*/
-    static void convertTreeToNodesArray(Node<T, GetScore> *node, int *index,
-                                        Node<T, GetScore> **array) {
-        if (!node) return;
-        convertTreeToNodesArray(node->left, index, array);
-        array[*index] = node;
-        (*index)++;
-        convertTreeToNodesArray(node->right, index, array);
-    }
-
-    /**
-     * function that converts a given tree into array of the data in the tree
-     * @param node - the root of the tree to convert
-     * @param index - the current index of the given "root"
-     * @param array  - the array to insert the data to
-     */
-    void convertTreeToDataArray(Node<T, GetScore> *node, int *index, T *array) {
-        if (!node) return;
-        convertTreeToDataArray(node->right, index, array);
-        array[*index] = node->data;
-        (*index)++;
-        convertTreeToDataArray(node->left, index, array);
-    }
-
-
-    /**
-     * Ths function merges two arrays into one ordered array with the given
-     * Compare function
-     * @param merged - an array to insert the ordered array
-     * @param changed - one of the arrays to merge
-     * @param changed_i - number of elements in the changed array
-     * @param orig - one of the arrays to merge
-     * @param orig_i - number of elements in the orig array
-     * @param compare - the function to compare with
-     */
-    template<typename Compare>
-    void mergeArrays(T **merged, T **changed, int changed_i,
-                     T **orig, int orig_i, Compare &compare) {
-        int i = 0, oi = 0, ci = 0;
-        while (oi < orig_i && ci < changed_i) {
-            if (compare((*changed)[ci], (*orig)[oi])) {
-                (*merged)[i] = (*changed)[ci++];
-            } else {
-                (*merged)[i] = (*orig)[oi++];
-            }
-            i++;
-        }
-        while (ci < changed_i) {
-            (*merged)[i++] = (*changed)[ci++];
-        }
-        while (oi < orig_i) {
-            (*merged)[i++] = (*orig)[oi++];
-        }
-    }
-
     //-------------------HELP FUNCTIONS-----------------------------
-    /**
-    * function object that inserts an array values into a given tree
-    */
-    class InsertArrayToTree {
-        Node<T, GetScore> **nodes;
-        int index;
-    public:
-        explicit InsertArrayToTree(Node<T, GetScore> **nodes) : nodes(nodes),
-                                                                index(0) {}
-
-        void operator()(T data) {
-            data = *(nodes[index++])->data;
-        }
-    };
-
-    /**
-     * function that updates the tree values with Update function if the
-     * Condition is true
-     * @param update - update function
-     * @param condition - condition function
-     * @param compare - compare data function
-     */
-    template<typename Update, typename Condition, typename Compare>
-    void conditionedUpdate(const Update &update,
-                           const Condition &condition,
-                           const Compare &compare) {
-        Node<T, GetScore> **nodes = new Node<T, GetScore> *[this->size];
-        T *changed, *orig;
-
-        int ind = 0;
-        convertTreeToNodesArray(root, &ind, nodes);
-        changed = new T[this->size];
-        orig = new T[this->size];
-        int orig_i = 0, changed_i = 0;
-        for (int i = 0; i < this->size; i++) {
-            if (condition(nodes[i]->data)) {
-                update(nodes[i]->data);
-                changed[changed_i++] = nodes[i]->data;
-            } else {
-                orig[orig_i++] = nodes[i]->data;
-            }
-        }
-        T *merged = new T[this->size];
-        mergeArrays(&merged, &changed, changed_i, &orig, orig_i, compare);
-        for (int i = 0; i < this->size; i++) {
-            nodes[i]->data = merged[i];
-        }
-        delete[] changed;
-        delete[] orig;
-        delete[] nodes;
-        delete[] merged;
-    }
 
     /**
      * The function goes over the tree in order and prints

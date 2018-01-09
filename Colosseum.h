@@ -49,7 +49,7 @@ class Colosseum {
         explicit GladiatorCompareByLevelAndID(Gladiator& X):
                 gladiator_id(X.getID()), level(X.getScore()) {}
         int operator()(const Gladiator& Y) const {
-            if (Y.getScore() > level || (Y.getScore() == level &&
+            if (Y.getScore() < level || (Y.getScore() == level &&
                                          Y.getID() < gladiator_id)) return 1;
             else if (Y.getScore() == level &&
                      Y.getID() == gladiator_id) return 0;
@@ -57,48 +57,34 @@ class Colosseum {
         }
     };
 
-    class HelpDynamicHashFunc;
+    class HelpDynamicHashFunc {
+    public:
+        explicit HelpDynamicHashFunc(){}
+        void operator()(TrainingGroup& X) const{
+            X.gladiators = nullptr;
+        }
+        void operator()(Gladiator& X) const{}
+    };
 
-    template<class T>
-    void Func(typename List<T>::Iterator X){
-        TrainingGroup* t = dynamic_cast<TrainingGroup*>(&X);
-        if(t)
-            t->gladiators = nullptr;
-    }
     //-----------Colosseum Fields--------------------------
     HashChains<TrainingGroup, getTrainingGroupKey> training_groups;
     HashChains<Gladiator, getGladiatorKey> gladiators;
     MinHeap groups_IDs;
 
 public:
-//    /**
-//     * default Constructor
-//     */
-//    Colosseum(): training_groups(getTrainingGroupKey()),
-//                 gladiators(getGladiatorKey()), groups_IDs(){};
 
     Colosseum(int n, int* trainingGroupsIDs):
             training_groups(getTrainingGroupKey()),
             gladiators(getGladiatorKey()), groups_IDs(n, trainingGroupsIDs){
-        try{
-            TrainingGroup *init_training_groups = new TrainingGroup[n];
-            for(int i=0; i < n ; ++i){
-                init_training_groups[i] = TrainingGroup(trainingGroupsIDs[i]);
-            }
-            training_groups = HashChains<TrainingGroup, getTrainingGroupKey>
-                    (init_training_groups, n, getTrainingGroupKey());
-            delete[] init_training_groups;
-        } catch (std::bad_alloc& e){
-            throw e;
+        for(int i=0; i < n ; ++i){
+            TrainingGroup new_group(trainingGroupsIDs[i]);
+            HelpDynamicHashFunc helpFunc;
+            training_groups.insert(new_group, helpFunc);
+            helpFunc(new_group);
         }
-
     }
 
-    ~Colosseum(){
-        delete[] this->training_groups.hash_table;
-        delete[] this->gladiators.hash_table;
-    }
-
+    ~Colosseum(){}
 
     //---------Library2 functions - documented in library2--------------------
 
@@ -115,9 +101,6 @@ public:
     }
 
     MinHeap& getGroupsHeap();
-
-    //void quit();
-
 };
 
 

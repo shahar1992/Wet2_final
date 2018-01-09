@@ -4,50 +4,34 @@
 
 #include "Colosseum.h"
 
-
-class Colosseum::HelpDynamicHashFunc {
-public:
-    explicit HelpDynamicHashFunc(){}
-    void operator()(TrainingGroup& X) const{
-//        TrainingGroup* t = dynamic_cast<TrainingGroup*>(X);
-//        if(t)
-            X.gladiators = nullptr;
-    }
-    void operator()(Gladiator& X) const{}
-};
-
 void setNewMinInMinHeap(Colosseum* colosseum);
 
 StatusType Colosseum::addTrainingGroup(int trainingGroupID) {
-    TrainingGroup *trainingGroup;
     try {
-        trainingGroup = new TrainingGroup(trainingGroupID);
-        training_groups.insert(*trainingGroup, HelpDynamicHashFunc());
+        TrainingGroup trainingGroup(trainingGroupID);
+        HelpDynamicHashFunc helpFunc;
+        training_groups.insert(trainingGroup, helpFunc);
         groups_IDs.insert(trainingGroupID);
-        delete trainingGroup;
+        helpFunc(trainingGroup);
         return SUCCESS;
     } catch (std::bad_alloc &e) {
         return ALLOCATION_ERROR;
     } catch (HashExceptions::ElementAlreadyExists &e) {
-        delete trainingGroup;
         return FAILURE;
     }
 }
 
 StatusType Colosseum::addGladiator(int gladiatorID, int score, int trainingGroup) {
-    Gladiator *gladiator;
     try {
         TrainingGroup *group = this->training_groups.find(trainingGroup);
-        gladiator = new Gladiator(gladiatorID, score, trainingGroup);
-        gladiators.insert(*gladiator, HelpDynamicHashFunc());
+        Gladiator gladiator(gladiatorID, score, trainingGroup);
+        gladiators.insert(gladiator, HelpDynamicHashFunc());
         group->getGladiatorsTree()->insert
-                (GladiatorCompareByLevelAndID(*gladiator), *gladiator);
-        delete gladiator;
+                (GladiatorCompareByLevelAndID(gladiator), gladiator);
         return SUCCESS;
     } catch (HashExceptions::ElementNotFound &e) {
         return FAILURE;
     } catch (HashExceptions::ElementAlreadyExists &e) {
-        delete gladiator;
         return FAILURE;
     } catch (std::bad_alloc &e) {
         return ALLOCATION_ERROR;
@@ -61,8 +45,9 @@ StatusType Colosseum::trainingGroupFight(int trainingGroup1, int trainingGroup2,
         TrainingGroup *group2 = this->training_groups.find(trainingGroup2);
         if (group1->getGladiatorsTree()->size < k1 ||
             !group1->isGroupActive() ||
-            group2->getGladiatorsTree()->size < k2 || !group2->isGroupActive()
-            || group1 == group2)
+            group2->getGladiatorsTree()->size < k2 ||
+            !group2->isGroupActive() ||
+            trainingGroup1 == trainingGroup2)
             return FAILURE;
         int size1 = group1->getGladiatorsTree()->getSumKLeftElements(k1);
         int size2 = group2->getGladiatorsTree()->getSumKLeftElements(k2);
